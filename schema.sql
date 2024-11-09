@@ -1,6 +1,6 @@
 -- Create the database
-CREATE DATABASE IF NOT EXISTS student_management;
-USE student_management;
+CREATE DATABASE IF NOT EXISTS student_portal_db;
+USE student_portal_db;
 
 -- Users table
 CREATE TABLE users (
@@ -35,6 +35,14 @@ CREATE TABLE student_courses (
     PRIMARY KEY (srn, course_id),
     FOREIGN KEY (srn) REFERENCES students(srn),
     FOREIGN KEY (course_id) REFERENCES courses(course_id)
+);
+
+CREATE TABLE course_faculty (
+    course_id VARCHAR(20),
+    faculty_id VARCHAR(50),
+    PRIMARY KEY (course_id, faculty_id),
+    FOREIGN KEY (course_id) REFERENCES courses(course_id),
+    FOREIGN KEY (faculty_id) REFERENCES users(user_id)
 );
 
 -- Course_Materials table
@@ -78,6 +86,7 @@ CREATE TABLE chat_messages (
     FOREIGN KEY (sender_id) REFERENCES users(user_id),
     FOREIGN KEY (receiver_id) REFERENCES users(user_id)
 );
+
 -- Add a new table for assignment submissions
 CREATE TABLE assignment_submissions (
     submission_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -90,9 +99,22 @@ CREATE TABLE assignment_submissions (
     FOREIGN KEY (assignment_id) REFERENCES assignments(assignment_id),
     FOREIGN KEY (student_id) REFERENCES students(srn)
 );
+-- Add faculty_id column to student_courses table
+ALTER TABLE student_courses ADD COLUMN faculty_id VARCHAR(50);
+ALTER TABLE student_courses ADD FOREIGN KEY (faculty_id) REFERENCES users(user_id);
+-- Create course_faculty table if it doesn't exist
+CREATE TABLE IF NOT EXISTS course_faculty (
+    course_id VARCHAR(20),
+    faculty_id VARCHAR(50),
+    PRIMARY KEY (course_id, faculty_id),
+    FOREIGN KEY (course_id) REFERENCES courses(course_id),
+    FOREIGN KEY (faculty_id) REFERENCES users(user_id)
+);
 
+-- Add is_google_form column to assignments table if it doesn't exist
 -- Add an 'is_google_form' column to the assignments table
-ALTER TABLE assignments ADD COLUMN is_google_form BOOLEAN DEFAULT FALSE;
+-- ALTER TABLE assignments ADD COLUMN is_google_form BOOLEAN DEFAULT FALSE;
+
 -- Insert initial data
 INSERT INTO users (user_id, password, role, name, email)
 VALUES('ADMIN001', SHA2('admin123', 256), 'admin', 'Admin', 'admin@gmail.com');
@@ -102,6 +124,14 @@ VALUES
 ('admin1', SHA2('password123', 256), 'admin', 'John Doe', 'john.doe@example.com'),
 ('admin2', SHA2('securepass456', 256), 'admin', 'Jane Smith', 'jane.smith@example.com'),
 ('admin3', SHA2('adminpass789', 256), 'admin', 'Bob Johnson', 'bob.johnson@example.com');
+-- INSERT INTO users (user_id, password, role, name, email)
+-- VALUES ('FACULTY1', SHA2('faculty_password', 256), 'faculty', 'John Doe', 'john.doe@example.com');
 
-INSERT INTO courses (course_id, course_name, faculty_id)
-VALUES ('UE22CS351A', 'Database Management System', 'FACULTY1');
+-- -- Now insert the course into the courses table
+-- INSERT INTO courses (course_id, course_name, faculty_id)
+-- VALUES ('UE22CS351A', 'Database Management System', 'FACULTY1');
+-- Add faculty_id column to student_courses table if it doesn't exist
+ALTER TABLE student_courses ADD COLUMN faculty_id VARCHAR(50);
+ALTER TABLE student_courses ADD FOREIGN KEY (faculty_id) REFERENCES users(user_id);
+
+
